@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
 import './App.css';
 
-
 function UserForm() {
- const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); 
+  const [submittedData, setSubmittedData] = useState([]);
 
-const initialFormState = {
-  name: '',
-  email: '',
-  firstName: '',
-  lastName: '',
-  middleName: '',
-  suffix: '',
-  age: '',
-  birthdate: '',
-  address: '',
-};
+  const initialFormState = {
+    name: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    middleName: '',
+    suffix: '',
+    age: '',
+    birthdate: '',
+    address: '',
+  };
 
- const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState(initialFormState);
 
- const handleChange = (e) => {
-   const { name, value } = e.target;
-   setFormData((prevData) => ({
-     ...prevData,         // keep previous values
-     [name]: value,       // update the changed field
-   }));
- };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,         // keep previous values
+      [name]: value,       // update the changed field
+    }));
+  };
 
   const clearForm = () => {
-  setFormData(initialFormState);
-};
+    setFormData(initialFormState);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,6 +51,7 @@ const initialFormState = {
     }
 
     console.log('Form submitted:', formData);
+    setSubmittedData((prev) => [...prev, formData]);
     setShowModal(true); // Show the modal
   };
   
@@ -59,7 +60,7 @@ const initialFormState = {
     setShowModal(false);
   };
 
- return (
+  return (
     <div >
       <h2>User Form</h2>
 
@@ -143,9 +144,53 @@ const initialFormState = {
         </div>
       )}
 
-
+      {/* Table of Submitted Entries */}
+      <h3>All Users</h3>
+      <div className="submitted-table">
+        <table>
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Middle Name</th>
+              <th>Last Name</th>
+              <th>Suffix</th>
+              <th>Age</th>
+              <th>Birthdate</th>
+              <th>Address</th>  
+            </tr>
+          </thead>
+          <tbody>
+            {submittedData.length > 0 ? (
+              submittedData.map((entry, index) => (
+                <tr key={index}>
+                  <td>{entry.firstName}</td>
+                  <td>{entry.middleName || 'N/A'}</td>
+                  <td>{entry.lastName}</td>
+                  <td>{entry.suffix || 'N/A'}</td>
+                  <td>{entry.age}</td>
+                  <td>
+                    {new Date(entry.birthdate).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </td>
+                  <td>{entry.address}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', fontStyle: 'italic' }}>
+                  No data submitted yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
     </div>
- );
+  );
 }
+
 export default UserForm;

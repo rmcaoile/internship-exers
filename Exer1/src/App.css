@@ -1,3 +1,23 @@
+.submitted-table {
+  margin-top: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+table th {
+  background-color: #000000;
+}
+
 .form-container {
   display: flex;
   flex-direction: column;
