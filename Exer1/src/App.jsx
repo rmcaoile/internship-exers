@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import './App.css';
 
 function UserForm() {
-  const [showModal, setShowModal] = useState(false); 
   const [submittedData, setSubmittedData] = useState([]);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const initialFormState = {
-    name: '',
-    email: '',
     firstName: '',
-    lastName: '',
     middleName: '',
+    lastName: '',
     suffix: '',
     age: '',
     birthdate: '',
@@ -22,8 +21,8 @@ function UserForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
-      ...prevData,         // keep previous values
-      [name]: value,       // update the changed field
+      ...prevData,
+      [name]: value,
     }));
   };
 
@@ -34,7 +33,6 @@ function UserForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Calculate age from birthdate
     const birthDateObj = new Date(formData.birthdate);
     const today = new Date();
     let calculatedAge = today.getFullYear() - birthDateObj.getFullYear();
@@ -47,99 +45,59 @@ function UserForm() {
 
     if (parseInt(formData.age, 10) !== calculatedAge) {
       alert(`Age (${formData.age}) does not match Birthdate (${birthDateObj.toLocaleDateString()}). Please correct it.`);
-      return; // stop submission
+      return;
     }
 
-    console.log('Form submitted:', formData);
-    setSubmittedData((prev) => [...prev, formData]);
-    setShowModal(true); // Show the modal
+    setShowConfirmModal(true); // Ask for confirmation
   };
-  
 
-  const closeModal = () => {
-    setShowModal(false);
+  const confirmSubmission = () => {
+    setSubmittedData((prev) => [...prev, formData]);
+    setShowConfirmModal(false);
+    setShowFormModal(false);
+    clearForm();
   };
 
   return (
-    <div >
+    <div>
       <h2>User Form</h2>
+      <button onClick={() => setShowFormModal(true)}>Add New User</button>
 
-      {/* Inputs */}
-      <form onSubmit={handleSubmit} className=  'form-container'>
-        <input
-          type="text"
-          name="firstName"
-          value={formData.firstName}
-          placeholder="Enter your first name"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="middleName"
-          value={formData.middleName}
-          placeholder="Enter your middle name"
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="lastName"
-          value={formData.lastName}
-          placeholder="Enter your last name"
-          onChange={handleChange}
-          required
-        />     
-        <input
-          type="text"
-          name="suffix"
-          value={formData.suffix}
-          placeholder="Enter your suffix"
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="age"
-          value={formData.age}
-          placeholder="Enter your age"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="date"
-          name="birthdate"
-          value={formData.birthdate}
-          placeholder="Enter your birthdate"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="address"
-          value={formData.address}
-          placeholder="Enter your address"
-          onChange={handleChange}
-          required
-        />
-
-        <button type="submit">Submit</button>
-        <button type="button" onClick={clearForm}>Clear</button>
-
-      </form>
-
-
-      {/* Modal */}
-      {showModal && (
+      {/* Form Modal */}
+      {showFormModal && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Submitted Information</h3>
+            <h3>Enter User Information</h3>
+            <form onSubmit={handleSubmit} className="form-container">
+              <input type="text" name="firstName" value={formData.firstName} placeholder="First name" onChange={handleChange} required />
+              <input type="text" name="middleName" value={formData.middleName} placeholder="Middle name" onChange={handleChange} />
+              <input type="text" name="lastName" value={formData.lastName} placeholder="Last name" onChange={handleChange} required />
+              <input type="text" name="suffix" value={formData.suffix} placeholder="Suffix" onChange={handleChange} />
+              <input type="number" name="age" value={formData.age} placeholder="Age" onChange={handleChange} required />
+              <input type="date" name="birthdate" value={formData.birthdate} onChange={handleChange} required />
+              <input type="text" name="address" value={formData.address} placeholder="Address" onChange={handleChange} required />
+              <button type="submit">Submit</button>
+              <button type="button" onClick={clearForm}>Clear</button>
+              <button type="button" onClick={() => setShowFormModal(false)}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Submission</h3>
             <p><strong>First Name:</strong> {formData.firstName}</p>
             <p><strong>Middle Name:</strong> {formData.middleName || 'N/A'}</p>
             <p><strong>Last Name:</strong> {formData.lastName}</p>
             <p><strong>Suffix:</strong> {formData.suffix || 'N/A'}</p>
             <p><strong>Age:</strong> {formData.age}</p>
-            <p><strong>Birthdate:</strong> { new Date(formData.birthdate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p><strong>Birthdate:</strong> {new Date(formData.birthdate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
             <p><strong>Address:</strong> {formData.address}</p>
-            <button onClick={closeModal}>Close</button>
+            <button onClick={confirmSubmission}>Confirm</button>
+            <button onClick={() => setShowConfirmModal(false)}>Cancel</button>
           </div>
         </div>
       )}
@@ -156,7 +114,7 @@ function UserForm() {
               <th>Suffix</th>
               <th>Age</th>
               <th>Birthdate</th>
-              <th>Address</th>  
+              <th>Address</th>
             </tr>
           </thead>
           <tbody>
@@ -168,13 +126,7 @@ function UserForm() {
                   <td>{entry.lastName}</td>
                   <td>{entry.suffix || 'N/A'}</td>
                   <td>{entry.age}</td>
-                  <td>
-                    {new Date(entry.birthdate).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </td>
+                  <td>{new Date(entry.birthdate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</td>
                   <td>{entry.address}</td>
                 </tr>
               ))
@@ -188,7 +140,6 @@ function UserForm() {
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }
