@@ -5,6 +5,10 @@ function UserForm() {
   const [submittedData, setSubmittedData] = useState([]);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(null); 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+
 
   const initialFormState = {
     firstName: '',
@@ -30,6 +34,23 @@ function UserForm() {
     setFormData(initialFormState);
   };
 
+  const openAddModal = () => {
+    clearForm();
+    setShowFormModal(true);
+  };
+
+  const openEditModal = (index) => {
+    const userToEdit = submittedData[index];
+    setFormData(userToEdit);
+    setEditIndex(index);
+    setShowFormModal(true);
+  };
+
+  const openDeleteModal = (index) => {
+  setDeleteIndex(index);
+  setShowDeleteModal(true);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -52,11 +73,30 @@ function UserForm() {
   };
 
   const confirmSubmission = () => {
-    setSubmittedData((prev) => [...prev, formData]);
+    if (editIndex !== null) {
+      // Update existing entry
+      setSubmittedData((prev) => {
+        const updated = [...prev];
+        updated[editIndex] = formData;
+        return updated;
+      });
+    } else {
+      // Add new entry
+      setSubmittedData((prev) => [...prev, formData]);
+    }
+
     setShowConfirmModal(false);
     setShowFormModal(false);
     clearForm();
+    setEditIndex(null);
+``};
+
+  const confirmDelete = () => {
+    setSubmittedData((prev) => prev.filter((_, idx) => idx !== deleteIndex));
+    setShowDeleteModal(false);
+    setDeleteIndex(null);
   };
+
 
   return (
     <div>
@@ -67,7 +107,7 @@ function UserForm() {
       {showFormModal && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Enter User Information</h3>
+            <h3>{editIndex !== null ? 'Edit User Information' : 'Enter User Information'}</h3>
             <form onSubmit={handleSubmit} className="form-container">
               <input type="text" name="firstName" value={formData.firstName} placeholder="First name" onChange={handleChange} required />
               <input type="text" name="middleName" value={formData.middleName} placeholder="Middle name" onChange={handleChange} />
@@ -78,7 +118,7 @@ function UserForm() {
               <input type="text" name="address" value={formData.address} placeholder="Address" onChange={handleChange} required />
               <button type="submit">Submit</button>
               <button type="button" onClick={clearForm}>Clear</button>
-              <button type="button" onClick={() => setShowFormModal(false)}>Cancel</button>
+              <button type="button" onClick={() => { setShowFormModal(false); clearForm(); }}>Cancel</button>
             </form>
           </div>
         </div>
@@ -88,7 +128,7 @@ function UserForm() {
       {showConfirmModal && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Confirm Submission</h3>
+            <h3>Confirm {editIndex !== null ? 'Update' : 'Submission'}</h3>
             <p><strong>First Name:</strong> {formData.firstName}</p>
             <p><strong>Middle Name:</strong> {formData.middleName || 'N/A'}</p>
             <p><strong>Last Name:</strong> {formData.lastName}</p>
@@ -98,6 +138,18 @@ function UserForm() {
             <p><strong>Address:</strong> {formData.address}</p>
             <button onClick={confirmSubmission}>Confirm</button>
             <button onClick={() => setShowConfirmModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation of Deletion Modal */}
+      {showDeleteModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete <strong>{submittedData[deleteIndex].firstName} {submittedData[deleteIndex].lastName}</strong>?</p>
+            <button onClick={confirmDelete}>Yes</button>
+            <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
           </div>
         </div>
       )}
@@ -115,6 +167,7 @@ function UserForm() {
               <th>Age</th>
               <th>Birthdate</th>
               <th>Address</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -128,11 +181,16 @@ function UserForm() {
                   <td>{entry.age}</td>
                   <td>{new Date(entry.birthdate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</td>
                   <td>{entry.address}</td>
+                  <td>
+                    <button onClick={() => openEditModal(index)}>Edit</button>
+                    <button onClick={() => openDeleteModal(index)}>Delete</button>
+                  </td>
+
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" style={{ textAlign: 'center', fontStyle: 'italic' }}>
+                <td colSpan="8" style={{ textAlign: 'center', fontStyle: 'italic' }}>
                   No data submitted yet.
                 </td>
               </tr>
