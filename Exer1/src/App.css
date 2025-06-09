@@ -58,9 +58,20 @@ input {
 
 
 button {
+ border: 1px solid #ddd;
  padding: 0.5rem;
  margin-top: 1rem;
  margin-left: 0.5rem;
 }
 
+.submit-button {
+  background-color: #00742c;
+}
 
+.edit-button {
+  background-color: #00475c;
+}
+
+.delete-button {
+  background-color: #830011;
+}

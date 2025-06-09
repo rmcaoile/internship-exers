@@ -30,12 +30,17 @@ function UserForm() {
     }));
   };
 
+  const handleDeleteAll = () => {
+    setSubmittedData([]);
+  };
+
   const clearForm = () => {
     setFormData(initialFormState);
   };
 
   const openAddModal = () => {
     clearForm();
+    setEditIndex(null);
     setShowFormModal(true);
   };
 
@@ -47,13 +52,14 @@ function UserForm() {
   };
 
   const openDeleteModal = (index) => {
-  setDeleteIndex(index);
-  setShowDeleteModal(true);
+    setDeleteIndex(index);
+    setShowDeleteModal(true);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Validate birthday and age
     const birthDateObj = new Date(formData.birthdate);
     const today = new Date();
     let calculatedAge = today.getFullYear() - birthDateObj.getFullYear();
@@ -89,7 +95,7 @@ function UserForm() {
     setShowFormModal(false);
     clearForm();
     setEditIndex(null);
-``};
+  };
 
   const confirmDelete = () => {
     setSubmittedData((prev) => prev.filter((_, idx) => idx !== deleteIndex));
@@ -100,8 +106,10 @@ function UserForm() {
 
   return (
     <div>
-      <h2>User Form</h2>
-      <button onClick={() => setShowFormModal(true)}>Add New User</button>
+      <h2>Exer 1</h2>
+      <button className="submit-button" onClick={() => openAddModal()}>Add New User</button>
+      <button className="delete-button" onClick={() => handleDeleteAll()}>Delete All</button>
+
 
       {/* Form Modal */}
       {showFormModal && (
@@ -182,8 +190,8 @@ function UserForm() {
                   <td>{new Date(entry.birthdate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</td>
                   <td>{entry.address}</td>
                   <td>
-                    <button onClick={() => openEditModal(index)}>Edit</button>
-                    <button onClick={() => openDeleteModal(index)}>Delete</button>
+                    <button className="edit-button" onClick={() => openEditModal(index)}>Edit</button>
+                    <button className="delete-button" onClick={() => openDeleteModal(index)}>Delete</button>
                   </td>
 
                 </tr>
