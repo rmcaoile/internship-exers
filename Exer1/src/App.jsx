@@ -7,6 +7,7 @@ function UserForm() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [editIndex, setEditIndex] = useState(null); 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
 
@@ -30,10 +31,6 @@ function UserForm() {
     }));
   };
 
-  const handleDeleteAll = () => {
-    setSubmittedData([]);
-  };
-
   const clearForm = () => {
     setFormData(initialFormState);
   };
@@ -54,6 +51,10 @@ function UserForm() {
   const openDeleteModal = (index) => {
     setDeleteIndex(index);
     setShowDeleteModal(true);
+  };
+
+  const openDeleteAllModal = () => {
+    setShowDeleteAllModal(true);
   };
 
   const handleSubmit = (e) => {
@@ -102,14 +103,22 @@ function UserForm() {
     setShowDeleteModal(false);
     setDeleteIndex(null);
   };
+  
+  const confirmDeleteAll = () => {
+    setSubmittedData([]);
+    setShowDeleteAllModal(false);
+  };
+
 
 
   return (
     <div>
       <h2>Exer 1</h2>
       <button className="submit-button" onClick={() => openAddModal()}>Add New User</button>
-      <button className="delete-button" onClick={() => handleDeleteAll()}>Delete All</button>
 
+      {submittedData.length > 0 && (
+        <button className="delete-button" onClick={() => openDeleteAllModal()}>Delete All</button>
+      )}
 
       {/* Form Modal */}
       {showFormModal && (
@@ -155,9 +164,21 @@ function UserForm() {
         <div className="modal">
           <div className="modal-content">
             <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete <strong>{submittedData[deleteIndex].firstName} {submittedData[deleteIndex].lastName}</strong>?</p>
+            <p>Are you sure you want to delete <strong>{submittedData[deleteIndex].firstName} {submittedData[deleteIndex].lastName}</strong> ?</p>
             <button onClick={confirmDelete}>Yes</button>
             <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation of Delete All Modal */}
+      {showDeleteAllModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Delete All</h3>
+            <p>Are you sure you want to delete <strong>All User Information</strong> ?</p>
+            <button onClick={confirmDeleteAll}>Yes</button>
+            <button onClick={() => setShowDeleteAllModal(false)}>Cancel</button>
           </div>
         </div>
       )}
