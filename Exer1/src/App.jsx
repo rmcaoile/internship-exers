@@ -10,7 +10,6 @@ function UserForm() {
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
-
   const initialFormState = {
     firstName: '',
     middleName: '',
@@ -59,6 +58,31 @@ function UserForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const { firstName, middleName, lastName, suffix, birthdate, age } = formData;
+
+    const nameRegex = /^[A-Za-z][A-Za-z' -]*$/;
+    const suffixRegex = /^[A-Za-z.]{0,5}$/;
+
+    // Validate names
+    if (!nameRegex.test(firstName)) {
+      alert('First Name can only contain letters, spaces, hyphens, or apostrophes. And must start with a letter.');
+      return;
+    }
+
+    if (middleName && !nameRegex.test(middleName)) {
+      alert('Middle Name can only contain letters, spaces, hyphens, or apostrophes. And must start with a letter.');
+      return;
+    }
+
+    if (!nameRegex.test(lastName)) {
+      alert('Last Name can only contain letters, spaces, hyphens, or apostrophes. And must start with a letter.');
+      return;
+    }
+
+    if (suffix && !suffixRegex.test(suffix)) {
+      alert('Suffix can only contain letters, and dots. And must start with a letter. (max 5 characters).');
+      return;
+    }
 
     // Validate birthday and age
     const birthDateObj = new Date(formData.birthdate);
@@ -75,6 +99,7 @@ function UserForm() {
       alert(`Age (${formData.age}) does not match Birthdate (${birthDateObj.toLocaleDateString()}). Please correct it.`);
       return;
     }
+
 
     setShowConfirmModal(true); // Ask for confirmation
   };
