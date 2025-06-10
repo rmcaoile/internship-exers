@@ -134,7 +134,7 @@ function App() {
             <Card
               key={product.id}
               onClick={() => openModal(product)}
-              className="hover:shadow-md transition-shadow bg-white cursor-pointer pt-5 pb-2"
+              className="transition duration-300 transform hover:-translate-y-2 hover:scale-105 hover:shadow-lg bg-white cursor-pointer pt-5 pb-2"
             >
               <CardContent className="p-4 space-y-2 text-black">
                 <img src={product.image} alt={product.title} className="w-full h-48 object-contain" />
