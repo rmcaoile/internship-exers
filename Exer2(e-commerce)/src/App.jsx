@@ -19,6 +19,9 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const [searchInput, setSearchInput] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
+
   useEffect(() => {
     getData()
   }, [])
@@ -29,9 +32,9 @@ function App() {
       setError(null)
       const response = await axios.get("https://fakestoreapi.com/products")
 
-    if (!Array.isArray(response.data) || response.data.length === 0) {
-      throw new Error("No products found.")
-    }
+      if (!Array.isArray(response.data) || response.data.length === 0) {
+        throw new Error("No products found.")
+      }
 
       setProducts(response.data)
     } catch (err) {
@@ -47,14 +50,33 @@ function App() {
     setIsModalOpen(true)
   }
 
-  const closeModal = () => {
-    setSelectedProduct(null)
-    setIsModalOpen(false)
+  const filteredProducts = products.filter((product) =>
+    (product.title + " " + product.category)
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  )
+
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchTerm(searchInput)
+    }
   }
 
   return (
     <div className="p-6 px-20">
       <h1 className="text-3xl font-bold mb-10 text-center">E-Commerce</h1>
+
+      <div className="flex justify-center mb-8">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="w-full max-w-md p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {loading ? (
@@ -76,7 +98,7 @@ function App() {
             </div>
           </div>
         ) : (
-          products.map((product) => (
+          filteredProducts.map((product) => (
             <Card
               key={product.id}
               onClick={() => openModal(product)}
@@ -93,8 +115,6 @@ function App() {
           ))
         )}
       </div>
-
-      
 
       {/* Product Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -118,7 +138,6 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
-
     </div>
   )
 }
