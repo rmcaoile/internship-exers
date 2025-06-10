@@ -4,6 +4,7 @@ import axios from "axios"
 import { Card, CardContent, CardTitle } from "@/components/components/ui/card"
 import { Skeleton } from "@/components/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/components/ui/alert"
+import { Button } from "@/components/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ function App() {
 
   const [searchInput, setSearchInput] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("All")
 
   useEffect(() => {
     getData()
@@ -50,23 +52,36 @@ function App() {
     setIsModalOpen(true)
   }
 
-  const filteredProducts = products.filter((product) =>
-    (product.title + " " + product.category)
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  )
-
-
+  
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       setSearchTerm(searchInput)
     }
   }
+  // const filteredProducts = products.filter((product) =>
+  //   (product.title + " " + product.category)
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase())
+  // )
+  
+  const categories = ["All", ...new Set(products.map((p) => p.category))]
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = (product.title + " " + product.category)
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+
+    const matchesCategory = categoryFilter === "All" || product.category === categoryFilter
+
+    return matchesSearch && matchesCategory
+  })
+
 
   return (
     <div className="p-6 px-20">
       <h1 className="text-3xl font-bold mb-10 text-center">E-Commerce</h1>
 
+      {/* Search Bar */}
       <div className="flex justify-center mb-8">
         <input
           type="text"
@@ -76,6 +91,19 @@ function App() {
           onKeyDown={handleKeyDown}
           className="w-full max-w-md p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+      </div>
+
+      {/* Categories */}
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
+        {categories.map((category) => (
+          <Button
+            key={category}
+            variant={categoryFilter === category ? "default" : "outline"}
+            onClick={() => setCategoryFilter(category)}
+          >
+            {category}
+          </Button>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -97,6 +125,10 @@ function App() {
               <p>{error}</p>
             </div>
           </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="col-span-full text-center text-gray-500">
+            No results found.
+          </div>
         ) : (
           filteredProducts.map((product) => (
             <Card
@@ -114,6 +146,7 @@ function App() {
             </Card>
           ))
         )}
+
       </div>
 
       {/* Product Modal */}
