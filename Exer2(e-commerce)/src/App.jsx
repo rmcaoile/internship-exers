@@ -28,6 +28,11 @@ function App() {
       setLoading(true)
       setError(null)
       const response = await axios.get("https://fakestoreapi.com/products")
+
+    if (!Array.isArray(response.data) || response.data.length === 0) {
+      throw new Error("No products found.")
+    }
+
       setProducts(response.data)
     } catch (err) {
       console.error("Error fetching products:", err)
@@ -51,25 +56,27 @@ function App() {
     <div className="p-6 px-20">
       <h1 className="text-3xl font-bold mb-10 text-center">E-Commerce</h1>
 
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="p-4">
-              <Skeleton className="w-full h-48 mb-4" />
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2 mb-1" />
-              <Skeleton className="h-4 w-1/4" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {loading ? (
+          [...Array(6)].map((_, i) => (
+            <Card key={i} className="pt-5 pb-2 bg-white">
+              <CardContent className="p-4 space-y-2">
+                <div className="w-full h-48 bg-gray-200 rounded mb-4" />
+                <div className="h-6 w-3/4 bg-gray-200 rounded" />
+                <div className="h-4 w-1/2 bg-gray-200 rounded" />
+                <div className="h-4 w-1/4 bg-gray-200 rounded" />
+              </CardContent>
             </Card>
-          ))}
-        </div>
-      ) : error ? (
-        <Alert variant="destructive" className="max-w-md mx-auto">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((product) => (
+          ))
+        ) : error ? (
+          <div className="col-span-full flex justify-center">
+            <div className="bg-red-100 text-red-700 p-4 rounded w-full max-w-md text-center">
+              <h2 className="font-bold text-lg mb-2">Error</h2>
+              <p>{error}</p>
+            </div>
+          </div>
+        ) : (
+          products.map((product) => (
             <Card
               key={product.id}
               onClick={() => openModal(product)}
@@ -77,34 +84,36 @@ function App() {
             >
               <CardContent className="p-4 space-y-2 text-black">
                 <img src={product.image} alt={product.title} className="w-full h-48 object-contain" />
-                <CardTitle className="text-base mt-5">{product.title}</CardTitle>
-                <p className="text-sm text-muted-foreground">Price: ${product.price}</p>
-                <p className="text-sm text-muted-foreground">Category: {product.category}</p>
-                <p className="text-sm text-green-600 font-medium">Rating: {product.rating.rate}</p>
+                <CardTitle className="text-base mt-5">{product?.title || "N/A"}</CardTitle>
+                <p className="text-sm text-muted-foreground">Price: ${product?.price ?? "N/A"}</p>
+                <p className="text-sm text-muted-foreground">Category: {product?.category || "N/A"}</p>
+                <p className="text-sm text-green-600 font-medium">Rating: {product?.rating?.rate ?? "N/A"}</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
+
+      
 
       {/* Product Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-lg bg-white text-black">
+        <DialogContent className="!max-w-4xl bg-white text-black">
           {selectedProduct && (
             <>
               <DialogHeader>
                 <DialogTitle>{selectedProduct.title}</DialogTitle>
               </DialogHeader>
               <img
-                src={selectedProduct.image}
-                alt={selectedProduct.title}
-                className="w-full h-48 object-contain mt-5 mb-4"
+                src={selectedProduct?.image || ""}
+                alt={selectedProduct?.title || "N/A"}
+                className="w-full h-60 object-contain mt-5 mb-4"
               />
-              <p><strong>Price:</strong> ${selectedProduct.price}</p>
-              <p><strong>Category:</strong> {selectedProduct.category}</p>
-              <p><strong>Rating:</strong> {selectedProduct.rating.rate} ({selectedProduct.rating.count} reviews)</p>
-              <p><strong>Description:</strong> {selectedProduct.description}</p>
-              <p><strong>Available Stock:</strong> {selectedProduct.rating.count}</p>
+              <p><strong>Price:</strong> ${selectedProduct?.price ?? "N/A"}</p>
+              <p><strong>Category:</strong> {selectedProduct?.category || "N/A"}</p>
+              <p><strong>Rating:</strong> {selectedProduct?.rating?.rate ?? "N/A"} </p>
+              <p><strong>Description:</strong> {selectedProduct?.description || "N/A"}</p>
+              <p><strong>Available Stock:</strong> {selectedProduct?.rating?.count ?? "N/A"}</p>
             </>
           )}
         </DialogContent>
