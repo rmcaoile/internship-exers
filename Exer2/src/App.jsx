@@ -7,7 +7,7 @@ import './App.css'
 function App() {
   const [result, setResult] = useState([]);
   const [city, setCity] = useState("manila")  
-  const [input, setInput] = useState("manila");
+  const [input, setInput] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
